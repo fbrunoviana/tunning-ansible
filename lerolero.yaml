@@ -1,0 +1,37 @@
+---
+- name: Playbook para testar SSH host key checking
+  hosts: "{{ hosts }}"
+  become: yes
+
+  tasks:
+    - name: Verificar versão do SO
+      command: uname -a
+      register: result_uname
+    - debug:
+        msg: "Versão do SO: {{ result_uname.stdout }}"
+
+    - name: Criar um arquivo temporário
+      file:
+        path: /tmp/teste_ansible.txt
+        state: touch
+
+    - name: Escrever no arquivo temporário
+      copy:
+        content: "Este é um teste para medir a diferença de desempenho.\n"
+        dest: /tmp/teste_ansible.txt
+
+    - name: Adicionar mais conteúdo ao arquivo
+      lineinfile:
+        path: /tmp/teste_ansible.txt
+        line: "Adicionando mais uma linha ao arquivo."
+
+    - name: Verificar o conteúdo do arquivo
+      command: cat /tmp/teste_ansible.txt
+      register: result_cat
+    - debug:
+        msg: "Conteúdo do arquivo: {{ result_cat.stdout }}"
+
+    - name: Remover o arquivo temporário
+      file:
+        path: /tmp/teste_ansible.txt
+        state: absent
